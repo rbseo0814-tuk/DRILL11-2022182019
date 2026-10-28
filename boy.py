@@ -53,6 +53,7 @@ class Sleep:
 STATES = {'IDLE': Idle, 'SLEEP': Sleep}
 
 KEY_EVENTS = {
+    (SDL_KEYDOWN, SDLK_SPACE): 'space_down',
 }
 
 
@@ -76,6 +77,7 @@ class Boy:
 
         self.machine.add_transition('time_out', 'IDLE', 'SLEEP')
 
+        self.machine.add_transition('space_down', 'SLEEP', 'IDLE')
 
         # 초기 상태는 transition 없이 정해지므로 enter를 직접 호출
         Idle.enter(self, None)
