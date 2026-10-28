@@ -106,6 +106,8 @@ class Boy:
         self.machine.add_transition('left_down', 'IDLE', 'RUN')
 
         self.machine.add_transition('space_down', 'SLEEP', 'IDLE')
+        self.machine.add_transition('right_down', 'SLEEP', 'RUN')
+        self.machine.add_transition('left_down', 'SLEEP', 'RUN')
 
         self.machine.add_transition('right_down', 'RUN', 'RUN')
         self.machine.add_transition('left_down', 'RUN', 'RUN')
