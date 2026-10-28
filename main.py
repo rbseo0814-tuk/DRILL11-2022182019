@@ -1,18 +1,6 @@
 from pico2d import *
-import random
 
-
-# Game object class here
-
-class Grass:
-    def __init__(self):
-        self.image = load_image('grass.png')
-
-    def draw(self):
-        self.image.draw(400, 30)
-
-    def update(self):
-        pass
+from grass import Grass
 
 
 class Boy:
@@ -56,11 +44,9 @@ def reset_world():
     world.append(boy)
 
 
-
 def update_world():
     for o in world:
         o.update()
-    pass
 
 
 def render_world():
