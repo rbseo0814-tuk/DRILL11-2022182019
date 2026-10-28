@@ -154,6 +154,7 @@ class Boy:
 
         self.machine.add_transition('right_down', 'RUN', 'RUN')
         self.machine.add_transition('left_down', 'RUN', 'RUN')
+        self.machine.add_transition('a_down', 'RUN', 'AUTO_RUN')   # 달리던 방향 그대로 AutoRun
         # 달리던 방향 키를 뗐을 때 반대쪽 키가 눌려 있으면 그쪽으로 계속 달린다 (먼저 등록된 전이가 우선)
         self.machine.add_transition('right_up', 'RUN', 'RUN', conditions=['moving_right', 'left_held'])
         self.machine.add_transition('left_up', 'RUN', 'RUN', conditions=['moving_left', 'right_held'])
