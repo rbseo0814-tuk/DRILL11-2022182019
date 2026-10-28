@@ -3,6 +3,7 @@ from transitions import Machine
 
 RUN_SPEED = 5
 AUTO_RUN_SPEED = 15         # 일반 Run의 3배
+AUTO_RUN_SCALE = 2          # 100x100 -> 200x200
 SLEEP_TIMEOUT = 5.0         # Idle에서 Sleep까지 (초)
 
 
@@ -74,7 +75,7 @@ class Run:
 
 
 class AutoRun:
-    HALF_W = 25
+    HALF_W = 25 * AUTO_RUN_SCALE
 
     @staticmethod
     def enter(boy, e):
@@ -99,7 +100,10 @@ class AutoRun:
     @staticmethod
     def draw(boy):
         row = 100 if boy.dir == 1 else 0
-        boy.image.clip_draw(boy.frame * 100, row, 100, 100, boy.x, boy.y)
+        size = 100 * AUTO_RUN_SCALE
+        # 확대해도 발이 땅에 붙어 있도록 중심을 올린다
+        boy.image.clip_draw(boy.frame * 100, row, 100, 100,
+                            boy.x, boy.y + (size - 100) // 2, size, size)
 
 
 STATES = {'IDLE': Idle, 'SLEEP': Sleep, 'RUN': Run, 'AUTO_RUN': AutoRun}
