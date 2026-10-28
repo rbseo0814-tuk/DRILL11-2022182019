@@ -64,7 +64,7 @@ class Run:
     @staticmethod
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
-        boy.x += boy.dir * RUN_SPEED
+        boy.x = clamp(25, boy.x + boy.dir * RUN_SPEED, 800 - 25)
 
     @staticmethod
     def draw(boy):
