@@ -148,26 +148,45 @@ machine.add_transition('left_down', 'AUTO_RUN', 'RUN')
 - [ ] AutoRun 중 방향키 → 그 방향으로 움직이는 일반 Run으로 돌아간다
 - [ ] `AutoRun`이 별도 클래스로 존재한다 (필수 조건)
 
-## 8. 제출 요건 (디스코드 공지 반영)
+## 8. 제출 요건 (과제 공지 반영)
 
-- [ ] **Drill #11 전용 새 GitHub 리포지토리** 생성, 리포지토리 URL 제출 (브랜치 URL·커밋 URL 금지)
-- [ ] 실행에 필요한 파일 전부 업로드: 모든 `.py` + 리소스(`animation_sheet.png`, `grass.png` 등) + `state_diagram.png`
-- [ ] 리소스 경로는 **상대경로** (`load_image('animation_sheet.png')`) — 절대경로 금지
-- [ ] 폴더 구조가 있다면 zip으로 묶어서도 제출
-- [ ] 참고사항(조작법, 추가 구현 내용)은 **과제 제출란에 직접 작성**
-- [ ] 다른 PC에서 클론 후 바로 실행되는지 확인
+- [x] 과제별 **별도 GitHub 저장소**, **Public** 설정 — `rbseo0814-tuk/DRILL11-2022182019`
+- [ ] e-Class에 **`.git`으로 끝나는 저장소 주소** 제출 — `https://github.com/rbseo0814-tuk/DRILL11-2022182019.git`
+- [x] **개발 과정 커밋 기록**을 단계별로 남김 (미준수 시 0점) — 10절 참고
+- [x] 개발 기획·요구사항 문서 **PRD.md** 포함
+- [x] 실행에 필요한 코드(`main.py`, `boy.py`, `grass.py`)와 이미지(`animation_sheet.png`, `grass.png`) 업로드, 클론 후 실행 확인
+- [x] 리소스 경로는 상대경로 (`load_image('animation_sheet.png')`)
+- [x] 상태 다이어그램 이미지 `state_diagram.png` 포함
+- [ ] 수업 시간 내 실습, 안내된 마감 시각까지 e-Class 제출
 
 **제출란 참고사항 예시**
 ```
-- 실행: python main.py (pico2d, transitions 필요)
+- 실행: python main.py (pico2d, transitions 필요) / 테스트: python test_boy.py
 - 조작: ←/→ 이동, a: 자동 무적 런(Idle 상태에서만), SPACE: Sleep에서 깨우기, ESC 종료
 - AutoRun은 boy.py의 AutoRun 클래스로 구현, 상태 다이어그램은 state_diagram.png
 ```
 
 ## 9. 작업 순서
 
-1. 강의 상태머신 소년 코드 + 리소스를 이 폴더로 복사, 그대로 실행되는지 확인
-2. `a_down` 이벤트 함수와 `AutoRun` 클래스 추가, 전이 테이블 연결
-3. 속도·크기·y 보정 값 조정, 엣지 케이스 확인
-4. 상태 다이어그램 이미지 제작 (`state_diagram.png`)
-5. 새 리포지토리 생성 → 커밋/푸시 → 클론해서 실행 확인 → URL 제출
+1. PRD 작성
+2. 강의 시작 코드(`boy_game.py`)를 `main.py` / `boy.py` / `grass.py`로 분리, `transitions` Machine으로 Idle 상태 구성
+3. LEC13 목표대로 Sleep, Run 상태 추가
+4. `AutoRun` 클래스 추가, 전이 테이블 연결, 속도·크기·y 보정 조정
+5. 상태 다이어그램 이미지 제작 (`state_diagram.png`)
+6. 엣지 케이스 수정, 상태 전이 자동 테스트(`test_boy.py`) 추가
+7. 저장소 push → 클론해서 실행 확인 → `.git` URL 제출
+
+## 10. 개발 로그 (커밋 단위)
+
+| 단계 | 내용 |
+|---|---|
+| docs | PRD 작성 |
+| chore | 강의 리소스(`animation_sheet.png`, `grass.png`) 추가 |
+| feat | 모듈 분리 + transitions Machine으로 Idle 상태 |
+| feat | Sleep 상태 (Idle 5초 → Sleep, SPACE → Idle) |
+| feat | Run 상태 (방향키, 화면 밖으로 나가지 않음) |
+| feat | **AutoRun 상태 클래스** (`a` → AutoRun, 5초 → Idle, 방향키 → Run) |
+| docs | 상태 다이어그램 이미지 |
+| fix | 양쪽 방향키를 함께 눌렀다 하나만 떼면 남은 방향으로 계속 달리기 |
+| test | 상태 전이 자동 테스트 |
+| docs | 제출 요건·개발 로그 갱신 |
