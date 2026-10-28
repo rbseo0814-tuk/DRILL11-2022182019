@@ -156,6 +156,8 @@ class Boy:
         self.machine.add_transition('left_up', 'RUN', 'IDLE', conditions='moving_left')
 
         self.machine.add_transition('time_out', 'AUTO_RUN', 'IDLE')
+        self.machine.add_transition('right_down', 'AUTO_RUN', 'RUN')
+        self.machine.add_transition('left_down', 'AUTO_RUN', 'RUN')
 
         # 초기 상태는 transition 없이 정해지므로 enter를 직접 호출
         Idle.enter(self, None)
