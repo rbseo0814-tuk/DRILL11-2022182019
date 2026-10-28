@@ -5,6 +5,7 @@ RUN_SPEED = 5
 AUTO_RUN_SPEED = 15         # 일반 Run의 3배
 AUTO_RUN_SCALE = 2          # 100x100 -> 200x200
 SLEEP_TIMEOUT = 5.0         # Idle에서 Sleep까지 (초)
+AUTO_RUN_DURATION = 5.0     # AutoRun 유지 시간 (초)
 
 
 class Idle:
@@ -80,6 +81,7 @@ class AutoRun:
     @staticmethod
     def enter(boy, e):
         boy.dir = boy.face_dir                 # 바라보던 방향으로 출발
+        boy.auto_run_start_time = get_time()
 
     @staticmethod
     def exit(boy, e):
@@ -96,6 +98,9 @@ class AutoRun:
         elif boy.x <= AutoRun.HALF_W:
             boy.x, boy.dir = AutoRun.HALF_W, 1
         boy.face_dir = boy.dir
+
+        if get_time() - boy.auto_run_start_time >= AUTO_RUN_DURATION:
+            boy.time_out()
 
     @staticmethod
     def draw(boy):
@@ -150,6 +155,7 @@ class Boy:
         self.machine.add_transition('right_up', 'RUN', 'IDLE', conditions='moving_right')
         self.machine.add_transition('left_up', 'RUN', 'IDLE', conditions='moving_left')
 
+        self.machine.add_transition('time_out', 'AUTO_RUN', 'IDLE')
 
         # 초기 상태는 transition 없이 정해지므로 enter를 직접 호출
         Idle.enter(self, None)
