@@ -74,7 +74,13 @@ key(SDL_KEYUP, SDLK_RIGHT, b); check(b.state == 'IDLE', 'all keys up -> IDLE')
 now[0] = 20.0; step(b); check(b.state == 'SLEEP', 'IDLE 5s -> SLEEP')
 key(SDL_KEYDOWN, SDLK_a, b); check(b.state == 'SLEEP', 'a ignored in SLEEP')
 key(SDL_KEYDOWN, SDLK_SPACE, b); check(b.state == 'IDLE', 'SLEEP space -> IDLE')
-key(SDL_KEYDOWN, SDLK_RIGHT, b); key(SDL_KEYDOWN, SDLK_a, b); check(b.state == 'RUN', 'a ignored in RUN')
+
+# Run 중 a -> 달리던 방향으로 AutoRun
+key(SDL_KEYDOWN, SDLK_LEFT, b); check(b.state == 'RUN' and b.dir == -1, 'left down -> RUN left')
+key(SDL_KEYDOWN, SDLK_a, b); check(b.state == 'AUTO_RUN' and b.dir == -1, 'RUN + a -> AUTO_RUN keeping direction')
+check(b.auto_run_start_time == 20.0, 'auto run timer starts on entry from RUN')
+key(SDL_KEYUP, SDLK_LEFT, b); check(b.state == 'AUTO_RUN', 'releasing run key keeps AUTO_RUN')
+now[0] = 25.0; step(b); check(b.state == 'IDLE', 'AUTO_RUN from RUN -> IDLE at 5s')
 
 close_canvas()
 print(f'{len(fails)} failed' if fails else 'ALL PASS')
