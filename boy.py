@@ -74,6 +74,8 @@ class Run:
 
 
 class AutoRun:
+    HALF_W = 25
+
     @staticmethod
     def enter(boy, e):
         boy.dir = boy.face_dir                 # 바라보던 방향으로 출발
@@ -86,6 +88,13 @@ class AutoRun:
     def do(boy):
         boy.frame = (boy.frame + 1) % 8
         boy.x += boy.dir * AUTO_RUN_SPEED
+
+        # 화면 좌우 끝에서 자동 방향 전환
+        if boy.x >= 800 - AutoRun.HALF_W:
+            boy.x, boy.dir = 800 - AutoRun.HALF_W, -1
+        elif boy.x <= AutoRun.HALF_W:
+            boy.x, boy.dir = AutoRun.HALF_W, 1
+        boy.face_dir = boy.dir
 
     @staticmethod
     def draw(boy):
