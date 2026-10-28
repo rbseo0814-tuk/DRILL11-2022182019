@@ -2,6 +2,7 @@ from pico2d import *
 from transitions import Machine
 
 RUN_SPEED = 5
+AUTO_RUN_SPEED = 15         # 일반 Run의 3배
 SLEEP_TIMEOUT = 5.0         # Idle에서 Sleep까지 (초)
 
 
@@ -72,7 +73,27 @@ class Run:
         boy.image.clip_draw(boy.frame * 100, row, 100, 100, boy.x, boy.y)
 
 
-STATES = {'IDLE': Idle, 'SLEEP': Sleep, 'RUN': Run}
+class AutoRun:
+    @staticmethod
+    def enter(boy, e):
+        boy.dir = boy.face_dir                 # 바라보던 방향으로 출발
+
+    @staticmethod
+    def exit(boy, e):
+        pass
+
+    @staticmethod
+    def do(boy):
+        boy.frame = (boy.frame + 1) % 8
+        boy.x += boy.dir * AUTO_RUN_SPEED
+
+    @staticmethod
+    def draw(boy):
+        row = 100 if boy.dir == 1 else 0
+        boy.image.clip_draw(boy.frame * 100, row, 100, 100, boy.x, boy.y)
+
+
+STATES = {'IDLE': Idle, 'SLEEP': Sleep, 'RUN': Run, 'AUTO_RUN': AutoRun}
 
 KEY_EVENTS = {
     (SDL_KEYDOWN, SDLK_RIGHT): 'right_down',
@@ -80,6 +101,7 @@ KEY_EVENTS = {
     (SDL_KEYUP, SDLK_RIGHT): 'right_up',
     (SDL_KEYUP, SDLK_LEFT): 'left_up',
     (SDL_KEYDOWN, SDLK_SPACE): 'space_down',
+    (SDL_KEYDOWN, SDLK_a): 'a_down',
 }
 
 
@@ -104,6 +126,7 @@ class Boy:
         self.machine.add_transition('time_out', 'IDLE', 'SLEEP')
         self.machine.add_transition('right_down', 'IDLE', 'RUN')
         self.machine.add_transition('left_down', 'IDLE', 'RUN')
+        self.machine.add_transition('a_down', 'IDLE', 'AUTO_RUN')
 
         self.machine.add_transition('space_down', 'SLEEP', 'IDLE')
         self.machine.add_transition('right_down', 'SLEEP', 'RUN')
@@ -113,6 +136,7 @@ class Boy:
         self.machine.add_transition('left_down', 'RUN', 'RUN')
         self.machine.add_transition('right_up', 'RUN', 'IDLE', conditions='moving_right')
         self.machine.add_transition('left_up', 'RUN', 'IDLE', conditions='moving_left')
+
 
         # 초기 상태는 transition 없이 정해지므로 enter를 직접 호출
         Idle.enter(self, None)
