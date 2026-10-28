@@ -1,6 +1,7 @@
 from pico2d import *
 from transitions import Machine
 
+RUN_SPEED = 5
 SLEEP_TIMEOUT = 5.0         # Idle에서 Sleep까지 (초)
 
 
@@ -50,9 +51,34 @@ class Sleep:
                                           -3.141592 / 2, '', boy.x + 25, boy.y - 25, 100, 100)
 
 
-STATES = {'IDLE': Idle, 'SLEEP': Sleep}
+class Run:
+    @staticmethod
+    def enter(boy, e):
+        # 왼쪽/오른쪽을 따로 두지 않고, 들어올 때 눌린 키로 방향을 정한다
+        boy.dir = boy.face_dir = 1 if e == 'right_down' else -1
+
+    @staticmethod
+    def exit(boy, e):
+        pass
+
+    @staticmethod
+    def do(boy):
+        boy.frame = (boy.frame + 1) % 8
+        boy.x += boy.dir * RUN_SPEED
+
+    @staticmethod
+    def draw(boy):
+        row = 100 if boy.dir == 1 else 0
+        boy.image.clip_draw(boy.frame * 100, row, 100, 100, boy.x, boy.y)
+
+
+STATES = {'IDLE': Idle, 'SLEEP': Sleep, 'RUN': Run}
 
 KEY_EVENTS = {
+    (SDL_KEYDOWN, SDLK_RIGHT): 'right_down',
+    (SDL_KEYDOWN, SDLK_LEFT): 'left_down',
+    (SDL_KEYUP, SDLK_RIGHT): 'right_up',
+    (SDL_KEYUP, SDLK_LEFT): 'left_up',
     (SDL_KEYDOWN, SDLK_SPACE): 'space_down',
 }
 
@@ -76,8 +102,15 @@ class Boy:
         )
 
         self.machine.add_transition('time_out', 'IDLE', 'SLEEP')
+        self.machine.add_transition('right_down', 'IDLE', 'RUN')
+        self.machine.add_transition('left_down', 'IDLE', 'RUN')
 
         self.machine.add_transition('space_down', 'SLEEP', 'IDLE')
+
+        self.machine.add_transition('right_down', 'RUN', 'RUN')
+        self.machine.add_transition('left_down', 'RUN', 'RUN')
+        self.machine.add_transition('right_up', 'RUN', 'IDLE', conditions='moving_right')
+        self.machine.add_transition('left_up', 'RUN', 'IDLE', conditions='moving_left')
 
         # 초기 상태는 transition 없이 정해지므로 enter를 직접 호출
         Idle.enter(self, None)
@@ -87,6 +120,12 @@ class Boy:
 
     def enter_state(self, event_data):
         STATES[self.state].enter(self, event_data.event.name)
+
+    def moving_right(self, event_data):
+        return self.dir == 1
+
+    def moving_left(self, event_data):
+        return self.dir == -1
 
     def handle_event(self, event):
         trigger = KEY_EVENTS.get((event.type, getattr(event, 'key', None)))
