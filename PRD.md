@@ -26,6 +26,7 @@
 | 현재 상태 | 이벤트 | 다음 상태 | 비고 |
 |---|---|---|---|
 | Idle | `a` 키 down | **AutoRun** | 신규 |
+| Run | `a` 키 down | **AutoRun** (달리던 방향 유지) | 신규 (추가 요구) |
 | AutoRun | 시작 후 5초 이상 경과 (`TIME_OUT`) | Idle | 신규 |
 | AutoRun | → 키 down | Run (오른쪽) | 신규, Run의 기존 enter 로직 재사용 |
 | AutoRun | ← 키 down | Run (왼쪽) | 신규, Run의 기존 enter 로직 재사용 |
@@ -42,6 +43,7 @@ stateDiagram-v2
     Sleep --> Idle : SPACE
 
     Idle --> AutoRun : a down
+    Run --> AutoRun : a down
     AutoRun --> Idle : 5초 경과 (TIME_OUT)
     AutoRun --> Run : ← / → down
     AutoRun --> AutoRun : 화면 끝 → 방향 반전
@@ -54,7 +56,8 @@ stateDiagram-v2
 ### FR-1. `a` 키 → AutoRun 진입 (1점)
 - `KEY_EVENTS`에 `(SDL_KEYDOWN, SDLK_a): 'a_down'` 추가
 - 전이 테이블에 `add_transition('a_down', 'IDLE', 'AUTO_RUN')` 추가
-- Idle 상태에서만 진입한다 (Run/Sleep에서 `a`는 무시).
+- Idle과 Run 상태에서 진입한다. Run에서 들어오면 달리던 방향(`face_dir`) 그대로 자동 질주를 시작한다. Sleep에서 `a`는 무시한다.
+- 전이 테이블에 `add_transition('a_down', 'RUN', 'AUTO_RUN')` 추가
 
 ### FR-2. AutoRun 시각/속도 변화 (1점)
 - 이동 속도: 일반 Run보다 확실히 빠르게 (예: Run 속도의 2~3배)
@@ -162,7 +165,7 @@ machine.add_transition('left_down', 'AUTO_RUN', 'RUN')
 **제출란 참고사항 예시**
 ```
 - 실행: python main.py (pico2d, transitions 필요) / 테스트: python test_boy.py
-- 조작: ←/→ 이동, a: 자동 무적 런(Idle 상태에서만), SPACE: Sleep에서 깨우기, ESC 종료
+- 조작: ←/→ 이동, a: 자동 무적 런(Idle 또는 방향키로 달리는 중), SPACE: Sleep에서 깨우기, ESC 종료
 - AutoRun은 boy.py의 AutoRun 클래스로 구현, 상태 다이어그램은 state_diagram.png
 ```
 
@@ -178,15 +181,29 @@ machine.add_transition('left_down', 'AUTO_RUN', 'RUN')
 
 ## 10. 개발 로그 (커밋 단위)
 
-| 단계 | 내용 |
-|---|---|
-| docs | PRD 작성 |
-| chore | 강의 리소스(`animation_sheet.png`, `grass.png`) 추가 |
-| feat | 모듈 분리 + transitions Machine으로 Idle 상태 |
-| feat | Sleep 상태 (Idle 5초 → Sleep, SPACE → Idle) |
-| feat | Run 상태 (방향키, 화면 밖으로 나가지 않음) |
-| feat | **AutoRun 상태 클래스** (`a` → AutoRun, 5초 → Idle, 방향키 → Run) |
-| docs | 상태 다이어그램 이미지 |
-| fix | 양쪽 방향키를 함께 눌렀다 하나만 떼면 남은 방향으로 계속 달리기 |
-| test | 상태 전이 자동 테스트 |
-| docs | 제출 요건·개발 로그 갱신 |
+| # | 단계 | 내용 |
+|---|---|---|
+| 1 | docs | PRD 작성 |
+| 2 | chore | `.gitignore` 추가 |
+| 3 | chore | 강의 리소스(`animation_sheet.png`, `grass.png`) 추가 |
+| 4 | feat | 강의 시작 코드 `boy_game.py`를 `main.py`로 가져오기 |
+| 5 | refactor | `Grass` 클래스를 `grass.py`로 분리 |
+| 6 | refactor | `Boy` 클래스를 `boy.py`로 분리 |
+| 7 | feat | transitions `Machine` 도입, `Idle` 상태 클래스 |
+| 8 | feat | Idle 5초 경과 → `Sleep` 상태 |
+| 9 | feat | Sleep에서 SPACE → Idle |
+| 10 | feat | `Run` 상태 (방향키 down → Run, up → Idle) |
+| 11 | fix | Run 중 화면 밖으로 나가지 않게 |
+| 12 | feat | Sleep에서 방향키 → Run |
+| 13 | feat | **`AutoRun` 상태 클래스**, `a` → 3배 속도 자동 질주 |
+| 14 | feat | AutoRun 화면 좌우 끝 자동 방향 전환 |
+| 15 | feat | AutoRun 2배 확대, 발 위치 보정 |
+| 16 | feat | AutoRun 5초 경과 → Idle |
+| 17 | feat | AutoRun 중 방향키 → Run |
+| 18 | docs | 상태 다이어그램 이미지 |
+| 19 | fix | 양쪽 방향키를 누르다 하나만 떼면 남은 방향으로 계속 달리기 |
+| 20 | test | 상태 전이 자동 테스트 |
+| 21 | docs | PRD 제출 요건·개발 로그 갱신 |
+| 22 | feat | Run 중에도 `a` → AutoRun (달리던 방향 유지) |
+| 23 | test | Run 중 `a` 테스트 |
+| 24 | docs | 상태 다이어그램·PRD 전이 명세 갱신 |
